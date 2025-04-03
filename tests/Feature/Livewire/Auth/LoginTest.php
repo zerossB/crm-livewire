@@ -34,3 +34,23 @@ it('should make shure to inform the user an error when email and password dosent
         ])
         ->assertSee(__('auth.failed'));
 });
+
+it('should make shure tahte the rate limiting is bloking after 5 attempts', function () {
+    $user = \App\Models\User::factory()->create();
+
+    foreach (range(1, 5) as $i) {
+        Livewire::test(Login::class)
+            ->set('email', $user->email)
+            ->set('password', 'wrong-password')
+            ->call('login');
+    }
+
+    Livewire::test(Login::class)
+        ->set('email', $user->email)
+        ->set('password', 'wrong-password')
+        ->call('login')
+        ->assertHasErrors([
+            'throttle',
+        ])
+        ->assertSee(__('auth.throttle', ['seconds' => 4]));
+});
