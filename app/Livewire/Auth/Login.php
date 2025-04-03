@@ -13,7 +13,8 @@ class Login extends Component
 
     public function render(): View
     {
-        return view('livewire.auth.login');
+        return view('livewire.auth.login')
+            ->layout('components.layouts.guest');
     }
 
     protected function rules(): array
@@ -30,8 +31,10 @@ class Login extends Component
 
         if (auth()->attempt(['email' => $this->email, 'password' => $this->password])) {
             $this->redirect(route('home'));
+
+            return;
         }
 
-        session()->flash('error', 'Invalid credentials.');
+        $this->addError('invalidCredentials', __('auth.failed'));
     }
 }

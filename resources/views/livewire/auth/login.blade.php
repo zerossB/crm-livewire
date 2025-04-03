@@ -1,3 +1,5 @@
 <div>
-    {{-- Because she competes with no one, no one can compete with her. --}}
+    @error('invalidCredentials')
+    <span>{{ $message }}</span>
+    @enderror
 </div>
