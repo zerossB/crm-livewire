@@ -32,7 +32,6 @@
 
         {{-- MENU --}}
         <x-menu activate-by-route>
-
             {{-- User --}}
             @if($user = auth()->user())
                 <x-menu-separator/>

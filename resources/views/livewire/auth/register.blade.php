@@ -1,5 +1,9 @@
 <div>
-    <x-card>
+    <x-card title="Register">
+        <x-slot name="subtitle">
+            Alweady have an account? <a wire:navigate href="{{ route('login') }}" class="link link-primary">Login</a>
+        </x-slot>
+
         <x-form wire:submit="register">
             <x-input label="Name" wire:model="name"/>
             <x-input label="Email" wire:model="email"/>
