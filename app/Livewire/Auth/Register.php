@@ -16,14 +16,15 @@ class Register extends Component
 
     public function render(): View
     {
-        return view('livewire.auth.register');
+        return view('livewire.auth.register')
+            ->layout('components.layouts.guest');
     }
 
     protected function rules(): array
     {
         return [
             'name' => ['required', 'max:255'],
-            'email' => ['required', 'max:255', 'email', 'confirmed'],
+            'email' => ['required', 'max:255', 'email', 'unique:users,email', 'confirmed'],
             'password' => ['required', 'max:255', Password::defaults()],
         ];
     }
