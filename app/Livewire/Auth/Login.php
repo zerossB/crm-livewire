@@ -38,7 +38,7 @@ class Login extends Component
         $this->ensureIsNotRateLimited();
 
         if (!Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
-            RateLimiter::hit($this->throttleKey(), 5);
+            RateLimiter::hit($this->throttleKey());
             $this->addError('invalidCredentials', __('auth.failed'));
 
             return;
@@ -59,6 +59,10 @@ class Login extends Component
         event(new Lockout(request()));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        $this->resetErrorBag([
+            'invalidCredentials',
+        ]);
 
         $this->addError(
             'throttle',
