@@ -10,7 +10,7 @@ it('renders successfully', function () {
 
 it('should be able to login', function () {
     \App\Models\User::factory()->create([
-        'email' => 'john@doe.com'
+        'email' => 'john@doe.com',
     ]);
 
     Livewire::test(Login::class)
