@@ -1,6 +1,8 @@
 <?php
 
 use App\Livewire\Auth\Register;
+use App\Models\User;
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Livewire\Livewire;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -17,7 +19,8 @@ it('should be able to register a new user in the system', function () {
         ->set('email_confirmation', 'john@doe.com')
         ->set('password', 'password')
         ->call('register')
-        ->assertHasNoErrors();
+        ->assertHasNoErrors()
+        ->assertRedirect(route('home'));
 
     assertDatabaseHas('users', [
         'name' => 'John Doe',
@@ -25,6 +28,12 @@ it('should be able to register a new user in the system', function () {
     ]);
 
     assertDatabaseCount('users', 1);
+
+    expect(auth()->check())
+        ->and(auth()->user())
+        ->toBeInstanceOf(User::class)
+        ->email
+        ->toBe('john@doe.com');
 });
 
 it('validation rules', function ($testCase) {

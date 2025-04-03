@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -23,7 +24,7 @@ class Register extends Component
         return [
             'name' => ['required', 'max:255'],
             'email' => ['required', 'max:255', 'email', 'confirmed'],
-            'password' => ['required', 'max:255'],
+            'password' => ['required', 'max:255', Password::defaults()],
         ];
     }
 
@@ -31,10 +32,14 @@ class Register extends Component
     {
         $this->validate();
 
-        User::query()->create([
+        $user = User::query()->create([
             'name' => $this->name,
             'email' => $this->email,
             'password' => bcrypt($this->password),
         ]);
+
+        auth()->login($user);
+
+        $this->redirect(route('home'));
     }
 }
