@@ -11,8 +11,11 @@ use Livewire\Component;
 class Register extends Component
 {
     public ?string $name = null;
+
     public ?string $email = null;
+
     public ?string $email_confirmation = null;
+
     public ?string $password = null;
 
     public function render(): View
@@ -24,8 +27,8 @@ class Register extends Component
     protected function rules(): array
     {
         return [
-            'name' => ['required', 'max:255'],
-            'email' => ['required', 'max:255', 'email', 'unique:users,email', 'confirmed'],
+            'name'     => ['required', 'max:255'],
+            'email'    => ['required', 'max:255', 'email', 'unique:users,email', 'confirmed'],
             'password' => ['required', 'max:255', Password::defaults()],
         ];
     }
@@ -35,8 +38,8 @@ class Register extends Component
         $this->validate();
 
         $user = User::query()->create([
-            'name' => $this->name,
-            'email' => $this->email,
+            'name'     => $this->name,
+            'email'    => $this->email,
             'password' => bcrypt($this->password),
         ]);
 
