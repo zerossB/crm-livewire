@@ -2,7 +2,8 @@
 
 namespace App\Livewire\Auth;
 
-use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Auth\Events\Lockout;
+use Illuminate\Support\Facades\{Auth, RateLimiter, Session};
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -12,6 +13,8 @@ class Login extends Component
     public string $email = '';
 
     public string $password = '';
+
+    public bool $remember = false;
 
     public function render(): View
     {
@@ -24,35 +27,50 @@ class Login extends Component
         return [
             'email'    => 'required|email|max:255',
             'password' => 'required|string|max:255',
+            'remember' => 'boolean',
         ];
     }
 
     public function login(): void
     {
-        if (RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
-            $seconds = RateLimiter::availableIn($this->throttleKey());
-
-            $this->addError('throttle', __('auth.throttle', ['seconds' => $seconds]));
-
-            return;
-        }
-
         $this->validate();
 
-        if (auth()->attempt(['email' => $this->email, 'password' => $this->password])) {
-            $this->redirect(route('home'));
+        $this->ensureIsNotRateLimited();
+
+        if (!Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+            RateLimiter::hit($this->throttleKey(), 5);
+            $this->addError('invalidCredentials', __('auth.failed'));
 
             return;
         }
 
-        RateLimiter::hit($this->throttleKey(), 5);
-        $this->addError('invalidCredentials', __('auth.failed'));
+        RateLimiter::clear($this->throttleKey());
+        Session::regenerate();
+
+        $this->redirectIntended(default: route('home', absolute: false), navigate: true);
     }
 
-    private function throttleKey(): string
+    protected function ensureIsNotRateLimited(): void
     {
-        return Str::transliterate(
-            Str::lower($this->email) . '|' . request()->ip()
+        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+            return;
+        }
+
+        event(new Lockout(request()));
+
+        $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        $this->addError(
+            'throttle',
+            __('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => ceil($seconds / 60),
+            ])
         );
+    }
+
+    protected function throttleKey(): string
+    {
+        return Str::transliterate(Str::lower($this->email) . '|' . request()->ip());
     }
 }

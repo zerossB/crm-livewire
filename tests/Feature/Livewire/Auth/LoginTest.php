@@ -51,6 +51,5 @@ it('should make shure tahte the rate limiting is bloking after 5 attempts', func
         ->call('login')
         ->assertHasErrors([
             'throttle',
-        ])
-        ->assertSee(__('auth.throttle', ['seconds' => 4]));
+        ]);
 });

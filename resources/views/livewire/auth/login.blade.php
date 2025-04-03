@@ -4,17 +4,19 @@
             Need account? <a wire:navigate href="{{ route('register') }}" class="link link-primary">Register</a>
         </x-slot>
 
-        @error('invalidCredentials')
+        @error('throttle')
         <x-alert title="Hey!" :description="$message" icon="o-exclamation-triangle" class="alert-warning text-sm"/>
         @enderror
 
-        @error('throttle')
+        @error('invalidCredentials')
         <x-alert title="Hey!" :description="$message" icon="o-exclamation-triangle" class="alert-warning text-sm"/>
         @enderror
 
         <x-form wire:submit="login">
             <x-input label="Email" wire:model="email"/>
             <x-password label="Password" wire:model="password" right/>
+
+            <x-checkbox label="Remember Me" wire:model="remember"/>
 
             <x-slot:actions>
                 <x-button label="Login" class="btn-primary" type="submit" spinner="save"/>
