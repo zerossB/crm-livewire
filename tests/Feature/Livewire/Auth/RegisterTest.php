@@ -61,3 +61,16 @@ it('validation rules', function ($testCase) {
         'password::required' => (object)['field' => 'password', 'value' => '', 'rule' => 'required'],
         'password::max:255' => (object)['field' => 'password', 'value' => str_repeat('*', 256), 'rule' => 'max'],
     ]);
+
+it('should send a notification welcoming the new user', function () {
+    Notification::fake();
+
+    Livewire::test(Register::class)
+        ->set('name', 'John Doe')
+        ->set('email', 'john@doe.com')
+        ->set('email_confirmation', 'john@doe.com')
+        ->set('password', 'password')
+        ->call('register');
+
+    Notification::assertSentTo(auth()->user(), \App\Notifications\Auth\WelcomeNewUser::class);
+});
