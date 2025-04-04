@@ -14,7 +14,8 @@ class PasswordRecovery extends Component
 
     public function render(): View
     {
-        return view('livewire.auth.password-recovery');
+        return view('livewire.auth.password-recovery')
+            ->layout('components.layouts.guest');
     }
 
     protected function rules(): array
@@ -24,12 +25,16 @@ class PasswordRecovery extends Component
         ];
     }
 
-    public function request(): void
+    public function recoveryPassword(): void
     {
         $this->validate();
 
-        Password::sendResetLink(['email' => $this->email]);
+        $status = Password::sendResetLink(['email' => $this->email]);
 
-        $this->successMessage = __('We have sent you a password recovery link');
+        $this->reset([
+            'email',
+        ]);
+
+        $this->successMessage = __($status);
     }
 }
