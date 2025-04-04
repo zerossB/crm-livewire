@@ -2,7 +2,7 @@
 
 use App\Livewire\Auth\PasswordRecovery;
 use App\Models\User;
-use Illuminate\Auth\Events\PasswordResetLinkSent;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Livewire\Livewire;
 
 use function Pest\Laravel\{assertDatabaseCount, assertDatabaseHas};
@@ -29,8 +29,7 @@ it('should be able to request for a password recovery', function () {
         ->assertHasNoErrors()
         ->assertSee(__('We have emailed your password reset link.'));
 
-    Notification::assertNotSentTo($user, PasswordResetLinkSent::class);
-    Notification::assertNotSentTo($user, PasswordResetLinkSent::class);
+    Notification::assertSentTo($user, ResetPassword::class);
 
     assertDatabaseCount('password_reset_tokens', 1);
     assertDatabaseHas('password_reset_tokens', [
