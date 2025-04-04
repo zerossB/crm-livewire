@@ -1,8 +1,11 @@
 <?php
 
 use App\Livewire\Auth\PasswordRecovery;
+use App\Models\User;
 use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Livewire\Livewire;
+
+use function Pest\Laravel\{assertDatabaseCount, assertDatabaseHas};
 
 it('renders successfully', function () {
     Livewire::test(PasswordRecovery::class)
@@ -16,7 +19,7 @@ it('needs to have a route to recovery password', function () {
 });
 
 it('should be able to request for a password recovery', function () {
-    $user = \App\Models\User::factory()->create();
+    $user = User::factory()->create();
 
     Notification::fake();
 
@@ -27,6 +30,12 @@ it('should be able to request for a password recovery', function () {
         ->assertSee(__('We have emailed your password reset link.'));
 
     Notification::assertNotSentTo($user, PasswordResetLinkSent::class);
+    Notification::assertNotSentTo($user, PasswordResetLinkSent::class);
+
+    assertDatabaseCount('password_reset_tokens', 1);
+    assertDatabaseHas('password_reset_tokens', [
+        'email' => $user->email,
+    ]);
 });
 
 it('should not be able to request for a password recovery with an invalid email', function ($value, $rule) {
