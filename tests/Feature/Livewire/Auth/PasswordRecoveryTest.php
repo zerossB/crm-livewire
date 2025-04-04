@@ -22,3 +22,13 @@ it('should be able to request for a password recovery', function () {
         ->assertHasNoErrors()
         ->assertSee(__('We have sent you a password recovery link'));
 });
+
+it('should not be able to request for a password recovery with an invalid email', function ($value, $rule) {
+    Livewire::test(PasswordRecovery::class)
+        ->set('email', $value)
+        ->call('request')
+        ->assertHasErrors(['email' => $rule]);
+})->with([
+    'required' => ['value' => '', 'rule' => 'required'],
+    'email'    => ['value' => 'invalid-email', 'rule' => 'email'],
+]);
