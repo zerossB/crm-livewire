@@ -13,4 +13,13 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/', Welcome::class)->name('home');
+
+    // Region Admin
+    Route::prefix('admin')
+        ->name('admin.')
+        ->middleware('can:be an admin')
+        ->group(function () {
+            Route::get('/', fn () => 'Admin Home')->name('home');
+        });
+    // End Region Admin
 });
