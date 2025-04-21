@@ -47,3 +47,32 @@ it('should block the access to an admin page if the user does not have the permi
         ->get(route('admin.home'))
         ->assertForbidden();
 });
+
+test('let`s make sure that we are using cache to store user permission', function () {
+    $user = User::factory()->create();
+
+    $user->givePermissionTo('be an admin');
+
+    $cacheKey = "User::{$user->id}::permissions";
+
+    expect(Cache::has($cacheKey))
+        ->toBeTrue('Checking if the cache has the key')
+        ->and(Cache::get($cacheKey))
+        ->toBe($user->permissions, 'Checking if the cache has the permissions');
+});
+
+it('let`s make shure that we are using the cache the retrieve/check when the user has the given permission', function () {
+    $user = User::factory()->create();
+
+    $user->givePermissionTo('be an admin');
+
+    \Illuminate\Support\Facades\DB::listen(function ($query) {
+        if (str_contains($query->sql, 'permissions')) {
+            expect($query->bindings)->toBeEmpty();
+        }
+    });
+
+    $user->hasPermissionTo('be an admin');
+
+    expect(true)->toBeTrue();
+});
