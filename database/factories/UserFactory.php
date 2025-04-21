@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Can;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -42,10 +43,10 @@ class UserFactory extends Factory
         ]);
     }
 
-    public function withPermission(string $string): Factory|UserFactory
+    public function withPermission(Can|string $permission): Factory|UserFactory
     {
-        return $this->afterCreating(function ($user) use ($string) {
-            $user->givePermissionTo($string);
+        return $this->afterCreating(function ($user) use ($permission) {
+            $user->givePermissionTo($permission);
         });
     }
 }

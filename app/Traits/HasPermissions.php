@@ -2,45 +2,55 @@
 
 namespace App\Traits;
 
+use App\Enums\Can;
 use App\Models\Permission;
-use Illuminate\Database\Eloquent\{Collection, Model};
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Cache;
 
 trait HasPermissions
 {
-    public function getCachePermissionsKey(): string
+    protected function getCachePermissionsKey(): string
     {
-        $model = class_basename($this);
-
-        return "{$model}::{$this->id}::permissions";
+        return sprintf('%s::%d::permissions', class_basename($this), $this->id);
     }
 
     public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(Permission::class)
-            ->orderBy('name');
+        return $this->belongsToMany(Permission::class)->orderBy('name');
     }
 
-    public function givePermissionTo(string $permissionName): Model
+    public function givePermissionTo(Can|string $permissionName): Permission
     {
-        $permission = $this->permissions()->firstOrCreate(['name' => $permissionName]);
+        $permissionKey = $permissionName instanceof Can ? $permissionName->value : $permissionName;
 
-        Cache::forget($this->getCachePermissionsKey());
-        Cache::rememberForever($this->getCachePermissionsKey(), function () {
-            return $this->permissions;
-        });
+        $permission = Permission::firstOrCreate(['name' => $permissionKey]);
+
+        $this->permissions()->syncWithoutDetaching($permission);
+
+        $this->refreshPermissionsCache();
 
         return $permission;
     }
 
-    public function hasPermissionTo(string $permissionName): bool
+    public function hasPermissionTo(Can|string $permissionName): bool
     {
-        /** @var Collection $permissions */
-        $permissions = Cache::get($this->getCachePermissionsKey(), function () {
+        $permissionKey = $permissionName instanceof Can ? $permissionName->value : $permissionName;
+
+        $permissions = $this->getCachedPermissions();
+
+        return $permissions->contains('name', $permissionKey);
+    }
+
+    protected function getCachedPermissions()
+    {
+        return Cache::rememberForever($this->getCachePermissionsKey(), function () {
             return $this->permissions;
         });
+    }
 
-        return $permissions->where('name', $permissionName)->isNotEmpty();
+    protected function refreshPermissionsCache(): void
+    {
+        Cache::forget($this->getCachePermissionsKey());
+        $this->getCachedPermissions();
     }
 }
