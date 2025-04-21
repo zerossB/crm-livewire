@@ -10,8 +10,10 @@ class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        Permission::query()->create([
-            'name' => Can::BE_AN_ADMIN,
-        ]);
+        collect(Can::cases())->each(function (Can $can) {
+            Permission::query()->create([
+                'name' => $can->value,
+            ]);
+        });
     }
 }
