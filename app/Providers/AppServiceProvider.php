@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Enums\Can;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        collect(Can::cases())->each(function (Can $permission) {
+            Gate::define($permission->value, function ($user) use ($permission) {
+                return $user->hasPermissionTo($permission);
+            });
+        });
     }
 }
