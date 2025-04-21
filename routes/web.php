@@ -17,7 +17,7 @@ Route::middleware('auth')->group(function () {
     // Region Admin
     Route::prefix('admin')
         ->name('admin.')
-        ->middleware('can:be an admin')
+        ->middleware('can:' . \App\Enums\Can::BE_AN_ADMIN->value)
         ->group(function () {
             Route::get('/', fn () => 'Admin Home')->name('home');
         });

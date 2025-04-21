@@ -25,7 +25,7 @@ test('should be able to give an user a permission to do something', function () 
     ]);
 });
 
-test('permission has to have a seeder', function () {
+test('permission must have a seeder', function () {
     $this->seed([
         PermissionSeeder::class,
         UserSeeder::class,
@@ -76,4 +76,12 @@ it('let`s make shure that we are using the cache the retrieve/check when the use
     $user->hasPermissionTo(Can::BE_AN_ADMIN);
 
     expect(true)->toBeTrue();
+});
+
+test('only be an admin users can access the admin page', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get(route('home'))
+        ->assertDontSeeText('Admin');
 });
