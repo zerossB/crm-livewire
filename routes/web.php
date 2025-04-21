@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
         ->group(function () {
             Route::get('/', Admin\Dashboard::class)->name('dashboard');
             Route::get('/users', Admin\Users\ListUsers::class)->name('users.list');
+            Route::get('/users/{user}', fn ($user) => $user->toArray())->name('users.show');
         });
     // End Region Admin
 });
