@@ -1,7 +1,11 @@
 <?php
 
-test('', function () {
-    $response = $this->get('/');
-
-    $response->assertStatus(200);
-});
+test('global test')
+    ->expect([
+        'dd',
+        'dump',
+        'env',
+        'ds',
+        'var_dump',
+        'ray',
+    ])->not->toBeUsed();
