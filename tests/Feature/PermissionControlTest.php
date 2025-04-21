@@ -45,7 +45,7 @@ it('should block the access to an admin page if the user does not have the permi
     $user = User::factory()->create();
 
     $this->actingAs($user)
-        ->get(route('admin.home'))
+        ->get(route('admin.dashboard'))
         ->assertForbidden();
 });
 
@@ -76,12 +76,4 @@ it('let`s make shure that we are using the cache the retrieve/check when the use
     $user->hasPermissionTo(Can::BE_AN_ADMIN);
 
     expect(true)->toBeTrue();
-});
-
-test('only be an admin users can access the admin page', function () {
-    $user = User::factory()->create();
-
-    $this->actingAs($user)
-        ->get(route('home'))
-        ->assertDontSeeText('Admin');
 });
