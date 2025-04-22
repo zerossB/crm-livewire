@@ -8,7 +8,9 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -40,22 +42,22 @@
             @if($user = auth()->user())
                 <x-menu-separator/>
 
-                <x-list-item :item="$user" value="name" sub-value="email" no-separator no-hover
-                             class="-mx-2 !-my-2 rounded">
+                <x-list-item :item="$user" value="name" sub-value="email"
+                             no-separator no-hover class="-mx-2 !-my-2 rounded">
                     <x-slot:actions>
-                        <livewire:auth.logout />
+                        <livewire:auth.logout/>
                     </x-slot:actions>
                 </x-list-item>
 
                 <x-menu-separator/>
             @endif
 
-            <x-menu-item title="Hello" icon="o-sparkles" link="/"/>
-
             @can(\App\Enums\Can::BE_AN_ADMIN)
                 <x-menu-sub title="Admin" icon="o-lock-closed">
-                    <x-menu-item title="Dashboard" icon="o-chart-bar-square" :link="route('admin.dashboard')" route="admin.dashboard"/>
-                    <x-menu-item title="Users" icon="o-users" :link="route('admin.users.list')" route="admin.users.list"/>
+                    <x-menu-item title="Dashboard" icon="o-chart-bar-square" :link="route('admin.dashboard')"
+                                 route="admin.dashboard"/>
+                    <x-menu-item title="Users" icon="o-users" :link="route('admin.users.list')"
+                                 route="admin.users.list"/>
                 </x-menu-sub>
             @endcan
         </x-menu>

@@ -61,3 +61,151 @@ it('check the table headers', function () {
     $component->assertSee('Name')
         ->assertSee('Email');
 });
+
+it('should be able to search for a user', function () {
+    $user = User::factory()->admin()->create();
+    actingAs($user);
+
+    $users = User::factory()
+        ->count(10)
+        ->create();
+
+    $randomName = $users->random()->name;
+
+    $component = Livewire::test(ListUsers::class);
+
+    $component->set('search', $randomName)
+        ->assertSet('search', function ($searchText) use ($randomName) {
+            expect($searchText)
+                ->toBe($randomName)
+                ->and(str($searchText)->contains($randomName))->toBeTrue();
+
+            return true;
+        })
+        ->assertSee($randomName)
+        ->assertDontSee($user->name);
+
+    expect($component->instance()->users)
+        ->toHaveCount(1)
+        ->first()
+        ->name->toBe($randomName);
+});
+
+it('should be able to filter by permissions', function () {
+    $user = User::factory()->admin()->create();
+    actingAs($user);
+
+    $users = User::factory()
+        ->count(10)
+        ->create();
+
+    $randomUser = $users->random();
+
+    $component = Livewire::test(ListUsers::class);
+
+    $permission = \App\Models\Permission::whereName(\App\Enums\Can::BE_AN_ADMIN->value)->first();
+
+    $component->set('searchPermissions', [$permission->id])
+        ->assertSet('searchPermissions', function ($permissions) {
+            expect($permissions)
+                ->toBe([1]);
+
+            return true;
+        })
+        ->assertCount('users', 1)
+        ->assertDontSee($randomUser->name)
+        ->assertSee($user->name);
+});
+
+it('should be able to clear the search', function () {
+    $user = User::factory()->admin()->create();
+    actingAs($user);
+
+    $users = User::factory()
+        ->count(10)
+        ->create();
+
+    $randomName = $users->random()->name;
+
+    $component = Livewire::test(ListUsers::class);
+
+    $component->set('search', $randomName)
+        ->assertSet('search', function ($searchText) use ($randomName) {
+            expect($searchText)
+                ->toBe($randomName)
+                ->and(str($searchText)->contains($randomName))->toBeTrue();
+
+            return true;
+        })
+        ->assertSee($randomName)
+        ->assertDontSee($user->name);
+
+    expect($component->instance()->users)
+        ->toHaveCount(1)
+        ->first()
+        ->name->toBe($randomName);
+
+    $component->call('clear')
+        ->assertSet('search', '')
+        ->assertCount('users', 11);
+});
+
+it('should be able to clear the permissions', function () {
+    $user = User::factory()->admin()->create();
+    actingAs($user);
+
+    $users = User::factory()
+        ->count(10)
+        ->create();
+
+    $randomUser = $users->random();
+
+    $component = Livewire::test(ListUsers::class);
+
+    $permission = \App\Models\Permission::whereName(\App\Enums\Can::BE_AN_ADMIN->value)->first();
+
+    $component->set('searchPermissions', [$permission->id])
+        ->assertSet('searchPermissions', function ($permissions) {
+            expect($permissions)
+                ->toBe([1]);
+
+            return true;
+        })
+        ->assertCount('users', 1)
+        ->assertDontSee($randomUser->name)
+        ->assertSee($user->name);
+
+    $component->call('clear')
+        ->assertSet('searchPermissions', [])
+        ->assertCount('users', 11);
+});
+
+it('should be able to open the drawer', function () {
+    $user = User::factory()->admin()->create();
+    actingAs($user);
+
+    $users = User::factory()
+        ->count(10)
+        ->create();
+
+    $component = Livewire::test(ListUsers::class);
+
+    $component->set('drawer', true)
+        ->assertSet('drawer', true);
+});
+
+it('should be able to close the drawer', function () {
+    $user = User::factory()->admin()->create();
+    actingAs($user);
+
+    $users = User::factory()
+        ->count(10)
+        ->create();
+
+    $component = Livewire::test(ListUsers::class);
+
+    $component->set('drawer', true)
+        ->assertSet('drawer', true)
+        ->set('drawer', false)
+        ->assertSet('drawer', false);
+});

@@ -29,6 +29,12 @@
 
     <!-- FILTER DRAWER -->
     <x-drawer wire:model="drawer" title="Filters" right separator with-close-button class="lg:w-1/3">
+
+        <x-choices
+            label="Permissions"
+            wire:model.live.debounce="searchPermissions"
+            :options="$this->permissions"/>
+
         <x-slot:actions>
             <x-button label="Reset" icon="o-x-mark" wire:click="clear" spinner/>
             <x-button label="Done" icon="o-check" class="btn-primary" @click="$wire.drawer = false"/>
