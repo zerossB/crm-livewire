@@ -17,6 +17,7 @@
             :headers="$this->headers"
             :rows="$this->users"
             :link="route('admin.users.show', ['user' => '[id]'])"
+            :sort-by="$sortBy"
             with-pagination
         >
             @scope('cell_permissions', $user)

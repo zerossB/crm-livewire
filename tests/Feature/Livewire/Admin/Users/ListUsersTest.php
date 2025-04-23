@@ -234,3 +234,65 @@ it('should be able to close the drawer', function () {
         ->set('drawer', false)
         ->assertSet('drawer', false);
 });
+
+it('should be able to order name column asc', function () {
+    $user = User::factory()->admin()->create();
+    actingAs($user);
+
+    $users = User::factory()
+        ->count(10)
+        ->create();
+
+    $firstUser = $users->sortBy('name')->first();
+
+    $component = Livewire::test(ListUsers::class);
+
+    $component->set('sortBy', [
+        'column'    => 'name',
+        'direction' => 'asc',
+    ])
+        ->assertSet('sortBy', [
+            'column'    => 'name',
+            'direction' => 'asc',
+        ])
+        ->assertSet('users', function ($users) use ($firstUser) {
+            expect($users)
+                ->toHaveCount(11)
+                ->first()
+                ->name->toBe($firstUser->name);
+
+            return true;
+        })
+        ->assertSee($firstUser->name);
+});
+
+it('should be able to order name column desc', function () {
+    $user = User::factory()->admin()->create();
+    actingAs($user);
+
+    $users = User::factory()
+        ->count(10)
+        ->create();
+
+    $firstUser = $users->sortBy('name', descending: true)->first();
+
+    $component = Livewire::test(ListUsers::class);
+
+    $component->set('sortBy', [
+        'column'    => 'name',
+        'direction' => 'desc',
+    ])
+        ->assertSet('sortBy', [
+            'column'    => 'name',
+            'direction' => 'desc',
+        ])
+        ->assertSet('users', function ($users) use ($firstUser) {
+            expect($users)
+                ->toHaveCount(11)
+                ->first()
+                ->name->toBe($firstUser->name);
+
+            return true;
+        })
+        ->assertSee($firstUser->name);
+});

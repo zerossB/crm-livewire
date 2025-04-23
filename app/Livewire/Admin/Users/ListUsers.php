@@ -26,6 +26,11 @@ class ListUsers extends Component
 
     public bool $drawer = false;
 
+    public array $sortBy = [
+        'column'    => 'name',
+        'direction' => 'asc',
+    ];
+
     public function mount(): void
     {
         $this->authorize(Can::BE_AN_ADMIN);
@@ -68,6 +73,7 @@ class ListUsers extends Component
             ->when($this->searchTrash, function ($query) {
                 $query->onlyTrashed();
             })
+            ->orderBy(...array_values($this->sortBy))
             ->paginate();
     }
 
