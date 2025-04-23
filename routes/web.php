@@ -21,6 +21,8 @@ Route::middleware('auth')->group(function () {
         ->middleware('can:' . Can::BE_AN_ADMIN->value)
         ->group(function () {
             Route::get('/', Admin\Dashboard::class)->name('dashboard');
+            Route::get('/users', Admin\Users\ListUsers::class)->name('users.list');
+            Route::get('/users/{user}', fn ($user) => $user->toArray())->name('users.show');
         });
     // End Region Admin
 });

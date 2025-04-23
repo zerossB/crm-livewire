@@ -43,7 +43,14 @@ class UserFactory extends Factory
         ]);
     }
 
-    public function withPermission(Can|string $permission): Factory|UserFactory
+    public function admin(): static
+    {
+        return $this->afterCreating(function ($user) {
+            $user->givePermissionTo(Can::BE_AN_ADMIN);
+        });
+    }
+
+    public function withPermission(Can|string $permission): static
     {
         return $this->afterCreating(function ($user) use ($permission) {
             $user->givePermissionTo($permission);
