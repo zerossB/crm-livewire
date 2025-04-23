@@ -296,3 +296,36 @@ it('should be able to order name column desc', function () {
         })
         ->assertSee($firstUser->name);
 });
+
+it('should be able to paginate users', function () {
+    $user = User::factory()->admin()->create();
+    actingAs($user);
+
+    $users = User::factory()
+        ->count(25)
+        ->create();
+
+    // Testa a primeira página
+    $component = Livewire::withQueryParams(['page' => 1])
+        ->test(ListUsers::class);
+
+    expect($component->instance()->users)
+        ->toBeInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class)
+        ->and($component->instance()->users->currentPage())->toBe(1);
+
+    // Testa a segunda página
+    $component = Livewire::withQueryParams(['page' => 2])
+        ->test(ListUsers::class);
+
+    expect($component->instance()->users->currentPage())->toBe(2);
+
+    // Garante que a paginação está funcionando
+    $firstPageIds = $component->instance()->users->getCollection()->pluck('id')->toArray();
+
+    $component = Livewire::withQueryParams(['page' => 1])
+        ->test(ListUsers::class);
+
+    $secondPageIds = $component->instance()->users->getCollection()->pluck('id')->toArray();
+
+    expect(array_intersect($firstPageIds, $secondPageIds))->toBe([]);
+});
