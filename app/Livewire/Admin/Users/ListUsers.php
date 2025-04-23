@@ -22,6 +22,8 @@ class ListUsers extends Component
 
     public array $searchPermissions = [];
 
+    public ?bool $searchTrash = null;
+
     public bool $drawer = false;
 
     public function mount(): void
@@ -39,6 +41,7 @@ class ListUsers extends Component
         $this->reset([
             'search',
             'searchPermissions',
+            'searchTrash',
         ]);
     }
 
@@ -47,6 +50,7 @@ class ListUsers extends Component
     {
         $this->validate([
             'search'              => 'nullable|string|max:255',
+            'searchTrash'         => 'nullable|boolean',
             'searchPermissions'   => 'array',
             'searchPermissions.*' => 'exists:permissions,id',
         ]);
@@ -60,6 +64,9 @@ class ListUsers extends Component
                 $query->whereHas('permissions', function ($query) {
                     $query->whereIn('id', $this->searchPermissions);
                 });
+            })
+            ->when($this->searchTrash, function ($query) {
+                $query->onlyTrashed();
             })
             ->paginate();
     }

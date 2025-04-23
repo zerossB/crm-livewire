@@ -117,6 +117,31 @@ it('should be able to filter by permissions', function () {
         ->assertSee($user->name);
 });
 
+it('should be able to filter trashed users', function () {
+    $user = User::factory()->admin()->create();
+    actingAs($user);
+
+    $users = User::factory()
+        ->count(10)
+        ->create();
+
+    $randomUser = $users->random();
+
+    $component = Livewire::test(ListUsers::class);
+
+    $component->set('searchTrash', false)
+        ->assertSet('searchTrash', false)
+        ->assertCount('users', 11)
+        ->assertSee($user->name);
+
+    $randomUser->delete();
+
+    $component->set('searchTrash', true)
+        ->assertSet('searchTrash', true)
+        ->assertCount('users', 1)
+        ->assertSee($randomUser->name);
+});
+
 it('should be able to clear the search', function () {
     $user = User::factory()->admin()->create();
     actingAs($user);

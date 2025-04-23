@@ -35,6 +35,10 @@
             wire:model.live.debounce="searchPermissions"
             :options="$this->permissions"/>
 
+        <x-checkbox
+            label="Only Trashed Users"
+            wire:model.live.debounce="searchTrash" />
+
         <x-slot:actions>
             <x-button label="Reset" icon="o-x-mark" wire:click="clear" spinner/>
             <x-button label="Done" icon="o-check" class="btn-primary" @click="$wire.drawer = false"/>
