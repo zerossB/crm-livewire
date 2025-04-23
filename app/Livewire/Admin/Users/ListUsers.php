@@ -62,7 +62,11 @@ class ListUsers extends Component
 
         $search = str($this->search)->lower();
 
-        return User::with('permissions')
+        return User::query()
+            ->with(['permissions'])
+            ->select([
+                'id', 'name', 'email',
+            ])
             ->when($this->search, fn ($query) => $query->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
                 ->orWhereRaw('LOWER(email) LIKE ?', ["%{$search}%"]))
             ->when($this->searchPermissions, function ($query) {
@@ -81,6 +85,9 @@ class ListUsers extends Component
     public function permissions(): array
     {
         return Permission::query()
+            ->select([
+                'id', 'name',
+            ])
             ->orderBy('name')
             ->get()->map(fn ($permission) => [
                 'id'   => $permission->id,
