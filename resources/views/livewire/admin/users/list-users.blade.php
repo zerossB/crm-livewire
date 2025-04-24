@@ -25,6 +25,10 @@
                 <x-badge value="{{ \Illuminate\Support\Str::title($permission->name) }}" class="mr-1 badge-soft"/>
             @endforeach
             @endscope
+
+            @scope('actions', $user)
+                <livewire:admin.users.delete :id="$user->id" />
+            @endscope
         </x-table>
     </x-card>
 
