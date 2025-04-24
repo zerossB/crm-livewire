@@ -46,3 +46,25 @@ it('should have a confirmation before deletion', function () {
         'id' => $userDeleted->id,
     ]);
 });
+
+it('should send a notification to user telling that he has no long access to the application', function () {
+    \Illuminate\Support\Facades\Notification::fake();
+
+    $user = User::factory()->admin()->create();
+
+    actingAs($user);
+
+    $userDeleted = User::factory()->create();
+
+    $component = \Livewire\Livewire::test(Users\Delete::class, [
+        'user' => $userDeleted,
+    ]);
+
+    $component->set('confirmation_confirmation', 'DART VADER')
+        ->call('destroy');
+
+    Notification::assertSentTo(
+        $userDeleted,
+        \App\Notifications\UserDeletedNotification::class,
+    );
+});

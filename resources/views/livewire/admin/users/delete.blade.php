@@ -1,3 +1,3 @@
 <div>
-    {{-- If your happiness depends on money, you will never be happy with yourself. --}}
+    <x-button wire:click="$set('modal', true)" icon="o-trash" class="btn-error btn-sm btn-soft"/>
 </div>
