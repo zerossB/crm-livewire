@@ -25,6 +25,20 @@
                 <x-badge value="{{ \Illuminate\Support\Str::title($permission->name) }}" class="mr-1 badge-soft"/>
             @endforeach
             @endscope
+
+            @scope('actions', $user)
+            <div>
+                @if($user->trashed())
+                    <x-button
+                        icon="o-arrow-uturn-left"
+                        wire:click="restore({{ $user->id }})"
+                        class="btn-primary btn-sm btn-soft"
+                    />
+                @else
+                    <livewire:admin.users.delete :user="$user"/>
+                @endif
+            </div>
+            @endscope
         </x-table>
     </x-card>
 
@@ -38,7 +52,7 @@
 
         <x-checkbox
             label="Only Trashed Users"
-            wire:model.live.debounce="searchTrash" />
+            wire:model.live.debounce="searchTrash"/>
 
         <x-slot:actions>
             <x-button label="Reset" icon="o-x-mark" wire:click="clear" spinner/>

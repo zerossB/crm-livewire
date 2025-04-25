@@ -26,6 +26,11 @@ class ListUsers extends Component
 
     public bool $drawer = false;
 
+    protected $listeners = [
+        'user:deleted'  => '$refresh',
+        'user:restored' => '$refresh',
+    ];
+
     public array $sortBy = [
         'column'    => 'name',
         'direction' => 'asc',
@@ -65,7 +70,7 @@ class ListUsers extends Component
         return User::query()
             ->with(['permissions'])
             ->select([
-                'id', 'name', 'email',
+                'id', 'name', 'email', 'created_at', 'updated_at', 'deleted_at',
             ])
             ->when($this->search, fn ($query) => $query->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
                 ->orWhereRaw('LOWER(email) LIKE ?', ["%{$search}%"]))
@@ -105,5 +110,14 @@ class ListUsers extends Component
             ['key' => 'email', 'label' => 'Email'],
             ['key' => 'permissions', 'label' => 'Permissions'],
         ];
+    }
+
+    public function restore(int $userId): void
+    {
+        User::withTrashed()
+            ->where('id', $userId)
+            ->restore();
+
+        $this->dispatch('user:restored');
     }
 }
